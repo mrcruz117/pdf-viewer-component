@@ -8,7 +8,16 @@ import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 // Worker
 import { Worker } from "@react-pdf-viewer/core"; // install this library
-import { Button, Card, Grid } from "@mui/material";
+import {
+  Button,
+  Card,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 
 export const App = () => {
   // Create new plugin instance
@@ -17,6 +26,7 @@ export const App = () => {
   // for onchange event
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfFileError, setPdfFileError] = useState("");
+  const [selectedDocType, setSelectedDocType] = useState(null);
 
   // for submit event
   const [viewPdf, setViewPdf] = useState(null);
@@ -93,7 +103,35 @@ export const App = () => {
               display={"flex"}
               justifyContent={"center"}
               alignItems={"center"}
-              xs={6}
+              xs={4}
+            >
+              <TextField
+                sx={{ minWidth: 120 }}
+                InputLabelProps={{ shrink: true }}
+                autoWidth
+                size={"small"}
+                select
+                value={selectedDocType}
+                label="Document Type"
+                onChange={(e) => setSelectedDocType(e.target.value)}
+                // helperText="Please select your currency"
+                variant="outlined"
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={"APU"}>APU</MenuItem>
+                <MenuItem value={"Engine"}>Engine</MenuItem>
+                <MenuItem value={"Aircraft"}>Aircraft</MenuItem>
+              </TextField>
+            </Grid>
+
+            <Grid
+              item
+              display={"flex"}
+              justifyContent={"center"}
+              alignItems={"center"}
+              xs={4}
             >
               {/* <div
                 style={{
@@ -102,7 +140,11 @@ export const App = () => {
                   alignItems: "center",
                 }}
               > */}
-              <Button variant="contained" component="label">
+              <Button
+                disabled={!selectedDocType}
+                variant="contained"
+                component="label"
+              >
                 Upload File
                 <input
                   hidden
@@ -114,16 +156,16 @@ export const App = () => {
               </Button>
               {/* </div> */}
             </Grid>
-            {pdfFileError && <div className="error-msg">{pdfFileError}</div>}
-            {/* <br></br> */}
+
             <Grid
               item
               display={"flex"}
               justifyContent={"center"}
               alignItems={"center"}
-              xs={6}
+              xs={4}
             >
               <Button
+                disabled={!pdfFile || !selectedDocType}
                 //  type="submit"
                 onClick={() => {
                   console.log("ingest");
@@ -134,8 +176,10 @@ export const App = () => {
                 Ingest PDF
               </Button>
             </Grid>
+
             {/* </form> */}
           </Grid>
+
           {/* <br></br> */}
           <Grid
             item
@@ -146,12 +190,13 @@ export const App = () => {
             xs={12}
           >
             <h4>View PDF</h4>
+            {pdfFileError && <div className="error-msg">{pdfFileError}</div>}
             {/* <div className="pdf-container"> */}
             {/* show pdf conditionally (if we have one)  */}
             {viewPdf && (
               <div
                 style={{
-                  height: "1000px",
+                  height: "700",
                   width: "100%",
                 }}
               >
