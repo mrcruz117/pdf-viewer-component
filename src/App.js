@@ -8,15 +8,26 @@ import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 // Worker
 import { Worker } from "@react-pdf-viewer/core"; // install this library
+import ClearIcon from "@mui/icons-material/Clear";
+import FolderIcon from '@mui/icons-material/Folder';
 import {
+  Alert,
+  Avatar,
   Button,
   Card,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
   MenuItem,
   Select,
+  Snackbar,
   TextField,
+  Typography,
 } from "@mui/material";
 
 export const App = () => {
@@ -27,6 +38,7 @@ export const App = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfFileError, setPdfFileError] = useState("");
   const [selectedDocType, setSelectedDocType] = useState(null);
+  const [ingestionQueue, setIngestionQueue] = useState([]);
 
   // for submit event
   const [viewPdf, setViewPdf] = useState(null);
@@ -46,6 +58,9 @@ export const App = () => {
       } else {
         setPdfFile(null);
         setPdfFileError("Please select valid pdf file");
+        setTimeout(() => {
+          setPdfFileError("");
+        }, 3000);
       }
     } else {
       console.log("select your file");
@@ -70,6 +85,14 @@ export const App = () => {
     }
   };
 
+  function generate(element) {
+    return [0, 1, 2].map((value) =>
+      React.cloneElement(element, {
+        key: value,
+      })
+    );
+  }
+
   return (
     <div
       style={{
@@ -78,6 +101,29 @@ export const App = () => {
         alignItems: "center",
       }}
     >
+      {pdfFileError && (
+        <Snackbar
+          sx={{
+            // marginTop: 1,
+            boxShadow: 5,
+          }}
+          severity="error"
+          open={pdfFileError}
+          autoHideDuration={5000}
+          // onClose={handleClose}
+          message={pdfFileError}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          // action={action}
+        >
+          <Alert
+            // onClose={handleClose}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            {pdfFileError}
+          </Alert>
+        </Snackbar>
+      )}
       <Grid
         container
         // display={"grid"}
@@ -190,7 +236,37 @@ export const App = () => {
             xs={12}
           >
             <h4>View PDF</h4>
-            {pdfFileError && <div className="error-msg">{pdfFileError}</div>}
+
+            <Grid item xs={12} md={6}>
+              <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
+                Avatar with text and icon
+              </Typography>
+
+              <List dense>
+                {generate(
+                  <ListItem
+                    secondaryAction={
+                      <IconButton edge="end" aria-label="delete">
+                        <ClearIcon />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemAvatar>
+                      <Avatar>
+                        <FolderIcon />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary="Single-line item"
+                      // secondary={secondary ? "Secondary text" : null}
+                    />
+                  </ListItem>
+                )}
+              </List>
+            </Grid>
+
+            {/* {pdfFileError && <div className="error-msg">{pdfFileError}</div>} */}
+
             {/* <div className="pdf-container"> */}
             {/* show pdf conditionally (if we have one)  */}
             {viewPdf && (
