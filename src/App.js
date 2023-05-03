@@ -9,12 +9,13 @@ import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 // Worker
 import { Worker } from "@react-pdf-viewer/core"; // install this library
 import ClearIcon from "@mui/icons-material/Clear";
-import FolderIcon from '@mui/icons-material/Folder';
+import FolderIcon from "@mui/icons-material/Folder";
 import {
   Alert,
   Avatar,
   Button,
   Card,
+  Divider,
   FormControl,
   Grid,
   IconButton,
@@ -35,7 +36,9 @@ export const App = () => {
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   // for onchange event
+  const [pdfFileUrl, setPdfFileUrl] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
+
   const [pdfFileError, setPdfFileError] = useState("");
   const [selectedDocType, setSelectedDocType] = useState(null);
   const [ingestionQueue, setIngestionQueue] = useState([]);
@@ -52,11 +55,13 @@ export const App = () => {
         let reader = new FileReader();
         reader.readAsDataURL(selectedFile);
         reader.onloadend = (e) => {
-          setPdfFile(e.target.result);
+          setPdfFile(selectedFile);
+          setPdfFileUrl(e.target.result);
           setPdfFileError("");
         };
       } else {
         setPdfFile(null);
+        setPdfFileUrl(null);
         setPdfFileError("Please select valid pdf file");
         setTimeout(() => {
           setPdfFileError("");
@@ -85,12 +90,21 @@ export const App = () => {
     }
   };
 
-  function generate(element) {
-    return [0, 1, 2].map((value) =>
-      React.cloneElement(element, {
-        key: value,
-      })
-    );
+  function addToQueue() {
+    const file = new setIngestionQueue((prev) => [
+      ...prev,
+      {
+        docType: selectedDocType,
+        docName: pdfFile.name,
+        docUrl: pdfFile,
+      },
+    ]);
+    setPdfFileUrl(null);
+    setPdfFile(null);
+  }
+
+  function removeFromQueue(url) {
+    setIngestionQueue((prev) => prev.filter((item) => item.docUrl !== url));
   }
 
   return (
@@ -141,7 +155,7 @@ export const App = () => {
         }}
         spacing={1}
       >
-        <Card sx={{ width: "100%", padding: 5, margin: 3, boxShadow: 10 }}>
+        <Card sx={{ width: "100%", padding: 5, margin: 3, boxShadow: 3 }}>
           <Grid container item xs={12}>
             {/* <form onSubmit={handlePdfFileSubmit}> */}
             <Grid
@@ -154,7 +168,7 @@ export const App = () => {
               <TextField
                 sx={{ minWidth: 120 }}
                 InputLabelProps={{ shrink: true }}
-                autoWidth
+                autowidth={"true"}
                 size={"small"}
                 select
                 value={selectedDocType}
@@ -186,21 +200,26 @@ export const App = () => {
                   alignItems: "center",
                 }}
               > */}
-              <Button
-                disabled={!selectedDocType}
-                variant="contained"
-                component="label"
-              >
-                Upload File
-                <input
-                  hidden
-                  type="file"
-                  className="form-control"
-                  required
-                  onChange={handlePdfFileChange}
-                />
-              </Button>
-              {/* </div> */}
+              {!pdfFileUrl ? (
+                <Button
+                  disabled={!selectedDocType}
+                  variant="contained"
+                  component="label"
+                >
+                  Upload File
+                  <input
+                    hidden
+                    type="file"
+                    className="form-control"
+                    required
+                    onChange={handlePdfFileChange}
+                  />
+                </Button>
+              ) : (
+                <Button variant="contained" onClick={addToQueue}>
+                  Add to Queue
+                </Button>
+              )}
             </Grid>
 
             <Grid
@@ -229,6 +248,7 @@ export const App = () => {
           {/* <br></br> */}
           <Grid
             item
+            container
             display={"flex"}
             direction={"column"}
             justifyContent={"center"}
@@ -238,47 +258,62 @@ export const App = () => {
             <h4>View PDF</h4>
 
             <Grid item xs={12} md={6}>
-              <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
+              {/* <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
                 Avatar with text and icon
-              </Typography>
-
-              <List dense>
-                {generate(
-                  <ListItem
-                    secondaryAction={
-                      <IconButton edge="end" aria-label="delete">
-                        <ClearIcon />
-                      </IconButton>
-                    }
-                  >
-                    <ListItemAvatar>
-                      <Avatar>
-                        <FolderIcon />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary="Single-line item"
-                      // secondary={secondary ? "Secondary text" : null}
-                    />
-                  </ListItem>
+              </Typography> */}
+              <Card sx={{ width: "100%", margin: 2, boxShadow: 2 }}>
+                {ingestionQueue.length > 0 && (
+                  <List dense>
+                    {ingestionQueue.map((item, idx) => {
+                      console.log("item", item);
+                      return (
+                        <>
+                          {idx !== 0 && (
+                            <Divider variant="inset" component="li" />
+                          )}
+                          <ListItem
+                            secondaryAction={
+                              <IconButton
+                                edge="end"
+                                aria-label="delete"
+                                onClick={() => removeFromQueue(item.docUrl)}
+                              >
+                                <ClearIcon />
+                              </IconButton>
+                            }
+                          >
+                            <ListItemAvatar>
+                              <Avatar>
+                                <FolderIcon />
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={item.docName}
+                              // secondary={secondary ? "Secondary text" : null}
+                            />
+                          </ListItem>
+                        </>
+                      );
+                    })}
+                  </List>
                 )}
-              </List>
+              </Card>
             </Grid>
 
             {/* {pdfFileError && <div className="error-msg">{pdfFileError}</div>} */}
 
             {/* <div className="pdf-container"> */}
             {/* show pdf conditionally (if we have one)  */}
-            {viewPdf && (
+            {pdfFileUrl && (
               <div
                 style={{
-                  height: "700",
+                  height: "900px",
                   width: "100%",
                 }}
               >
                 <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.5.141/build/pdf.worker.min.js">
                   <Viewer
-                    fileUrl={viewPdf}
+                    fileUrl={pdfFileUrl}
                     plugins={[defaultLayoutPluginInstance]}
                   />
                 </Worker>
@@ -286,7 +321,7 @@ export const App = () => {
             )}
 
             {/* if we dont have pdf or viewPdf state is null */}
-            {!viewPdf && <>No pdf file selected</>}
+            {!pdfFileUrl && <>No pdf file selected</>}
             {/* </div> */}
           </Grid>
         </Card>
