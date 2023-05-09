@@ -30,6 +30,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { messageToApi } from "./apiActions";
+
+// import { uploadFileToBlobStorage } from "./functions/uploadBlob";
 
 export const App = () => {
   // Create new plugin instance
@@ -41,6 +44,7 @@ export const App = () => {
 
   const [pdfFileError, setPdfFileError] = useState("");
   const [selectedDocType, setSelectedDocType] = useState(null);
+  const [serialNumber, setSerialNumber] = useState("");
   const [ingestionQueue, setIngestionQueue] = useState([]);
 
   // for submit event
@@ -94,6 +98,7 @@ export const App = () => {
     const file = new setIngestionQueue((prev) => [
       ...prev,
       {
+        serialNumber,
         docType: selectedDocType,
         docName: pdfFile.name,
         docUrl: pdfFile,
@@ -106,6 +111,20 @@ export const App = () => {
   function removeFromQueue(url) {
     setIngestionQueue((prev) => prev.filter((item) => item.docUrl !== url));
   }
+
+  const handleSendPdfToBlockstore = () => {
+    const testItem = ingestionQueue[0];
+    console.log("files", ingestionQueue);
+
+    const blobNameString = testItem.docName;
+    const filePathString = testItem.docUrl;
+
+    console.log(blobNameString, filePathString);
+
+    // uploadFileToBlobStorage(blobNameString, filePathString);
+
+    messageToApi(ingestionQueue);
+  };
 
   return (
     <div
@@ -167,6 +186,7 @@ export const App = () => {
             >
               <TextField
                 sx={{ minWidth: 120 }}
+                disabled={ingestionQueue.length > 0}
                 InputLabelProps={{ shrink: true }}
                 autowidth={"true"}
                 size={"small"}
@@ -184,6 +204,21 @@ export const App = () => {
                 <MenuItem value={"Engine"}>Engine</MenuItem>
                 <MenuItem value={"Aircraft"}>Aircraft</MenuItem>
               </TextField>
+              <TextField
+                sx={{ minWidth: 120 }}
+                disabled={ingestionQueue.length > 0}
+                InputLabelProps={{ shrink: true }}
+                autowidth={"true"}
+                size={"small"}
+                value={serialNumber}
+                label="serial Number"
+                onChange={(e) => {
+                  console.log("serialNumber", serialNumber);
+                  setSerialNumber(e.target.value);
+                }}
+                // helperText="Please select your currency"
+                variant="outlined"
+              ></TextField>
             </Grid>
 
             <Grid
@@ -230,15 +265,12 @@ export const App = () => {
               xs={4}
             >
               <Button
-                disabled={!pdfFile || !selectedDocType}
+                disabled={!ingestionQueue.length > 0}
                 //  type="submit"
-                onClick={() => {
-                  console.log("ingest");
-                  // handlePdfFileSubmit();
-                }}
+                onClick={handleSendPdfToBlockstore}
                 className="btn btn-success btn-lg"
               >
-                Ingest PDF
+                Send to Blockstore
               </Button>
             </Grid>
 
@@ -265,7 +297,7 @@ export const App = () => {
                 {ingestionQueue.length > 0 && (
                   <List dense>
                     {ingestionQueue.map((item, idx) => {
-                      console.log("item", item);
+                      // console.log("item", item);
                       return (
                         <>
                           {idx !== 0 && (
