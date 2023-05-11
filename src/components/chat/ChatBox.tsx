@@ -10,12 +10,10 @@ import {
   createTheme,
 } from "@mui/material";
 import {
-  ActionRequest,
-  AudioActionResponse,
   ChatController,
-  FileActionResponse,
+
   // MuiChat,
-} from "chat-ui-react";
+} from "./chat-controller.ts";
 import React from "react";
 
 import { MuiChat } from "./mui/MuiChat.tsx";
@@ -52,7 +50,7 @@ export default function ChatBox(): React.ReactElement {
             maxWidth: "640px",
             marginLeft: "auto",
             marginRight: "auto",
-            marginBottom: 5,
+            marginBottom: "5px",
             bgcolor: "background.default",
             // margin: 3,
             boxShadow: 5,

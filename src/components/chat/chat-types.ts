@@ -8,7 +8,7 @@ export interface Message<C extends MessageContent> {
   content: C;
   self: boolean;
   username?: string;
-  avatar?: string;
+  avatar?: JSX.Element;
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
