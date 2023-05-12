@@ -9,6 +9,8 @@ import {
   ThemeProvider,
   Typography,
   createTheme,
+  TextField,
+  MenuItem,
 } from "@mui/material";
 import {
   ChatController,
@@ -17,7 +19,7 @@ import {
 } from "./chat-controller.ts";
 import { ApiContext } from "../../contexts/ApiContext.js";
 
-import { askQuestion, getContainerNames } from "../../contexts/apiActions.js";
+import { askQuestion } from "../../contexts/apiActions.js";
 
 import { MuiChat } from "./mui/MuiChat.tsx";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
@@ -31,8 +33,15 @@ const muiTheme = createTheme({
 });
 
 export default function ChatBox(): React.ReactElement {
-  const { loading, dispatch } = useContext(ApiContext) as any;
-  console.log("loading", loading);
+  const {
+    loading,
+    dispatch,
+    containerOptions,
+    setSelectedContainer,
+    selectedContainer,
+  } = useContext(ApiContext) as any;
+
+  // const [selectedContainerName, setSelectedContainerName] = React.useState("");
 
   useEffect(() => {
     dispatch({ type: "SET_LOADING" });
@@ -43,15 +52,44 @@ export default function ChatBox(): React.ReactElement {
       showDateTime: true,
     })
   );
+  const handleSelect = (e) => {
+    console.log("e", e.target);
+    setSelectedContainer(e.target.value);
+  };
 
-  React.useMemo(() => {
-    echo(chatCtl);
-  }, [chatCtl]);
+  React.useEffect(() => {
+    console.log("selectedContainer", selectedContainer);
+    echo(chatCtl, selectedContainer);
+  }, [chatCtl, selectedContainer]);
 
   return (
     <ThemeProvider theme={muiTheme}>
       <CssBaseline />
       <Box sx={{ height: "500px" }}>
+        {containerOptions.length > 0 && (
+          <TextField
+            sx={{ minWidth: 120 }}
+            // disabled={ingestionQueue.length > 0}
+            InputLabelProps={{ shrink: true }}
+            // autowidth={true}
+            size={"small"}
+            select
+            value={selectedContainer}
+            label="Saved Documents"
+            onChange={handleSelect}
+            // helperText="Please select your currency"
+            variant="outlined"
+          >
+            <MenuItem value={""}>Select</MenuItem>
+            {containerOptions.map((option: any, idx) => {
+              return (
+                <MenuItem key={`${option}_${idx}`} value={option}>
+                  {option}
+                </MenuItem>
+              );
+            })}
+          </TextField>
+        )}
         <Card
           sx={{
             display: "flex",
@@ -74,18 +112,20 @@ export default function ChatBox(): React.ReactElement {
     </ThemeProvider>
   );
 }
-
-async function echo(chatCtl: ChatController): Promise<void> {
-  await chatCtl.addMessage({
-    type: "text",
-    content: `Please enter something.`,
-    self: false,
-    avatar: <SmartToyIcon />,
-  });
+async function echo(
+  chatCtl: ChatController,
+  selectedContainer: string
+): Promise<void> {
+  // await chatCtl.addMessage({
+  //   type: "text",
+  //   content: `How can I help you?`,
+  //   self: false,
+  //   avatar: <SmartToyIcon />,
+  // });
 
   const text = await chatCtl.setActionRequest({
     type: "text",
-    placeholder: "Please enter something",
+    placeholder: "Ask a question",
   });
 
   // handle api response test
@@ -95,17 +135,25 @@ async function echo(chatCtl: ChatController): Promise<void> {
 
   const question = {
     question: text.value,
-    bundle: "APU/APU SN P-2273",
+    bundle: selectedContainer,
+    // bundle: "APU/APU SN P-2273",
   };
+  let answer;
 
-  const test_question = await askQuestion(question);
+  console.log("selectedContainer", selectedContainer);
+  if (selectedContainer) {
+    console.log("question", question);
+    const test_question = await askQuestion(question);
 
-  console.log("test_question", test_question);
+    console.log("test_question", test_question);
 
-  const answer =
-    test_question.data && test_question.data.answer
-      ? test_question.data.answer
-      : "Sorry, there was an error. Please try again.";
+    answer =
+      test_question && test_question.data && test_question.data.answer
+        ? test_question.data.answer
+        : "Sorry, there was an error. Please try again.";
+  } else {
+    answer = "Please select a saved document.";
+  }
 
   await chatCtl.addMessage({
     type: "text",
@@ -251,7 +299,7 @@ async function echo(chatCtl: ChatController): Promise<void> {
   //   avatar: "-",
   // });
 
-  echo(chatCtl);
+  echo(chatCtl, selectedContainer);
 }
 
 // function GoodInput({

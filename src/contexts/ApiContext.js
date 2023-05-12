@@ -17,11 +17,22 @@ export const ApiProvider = ({ children }) => {
     errorCode: "",
 
     containerOptions: [],
+    selectedContainer: "",
+    // setSelectedContainer: () => {},
 
     loading: false,
   };
 
   const [state, dispatch] = useReducer(apiReducer, initialState);
+
+  const setSelectedContainer = (container) => {
+    console.log("inside setSelectedContainer");
+    console.log("containerVal", container);
+    dispatch({
+      type: "SET_SELECTED_CONTAINER",
+      payload: container,
+    });
+  };
 
   // get container names
   console.log("before useEffect in ApiContext");
@@ -48,9 +59,11 @@ export const ApiProvider = ({ children }) => {
     <ApiContext.Provider
       value={{
         ...state,
-        dispatch,
-
         // accounts,
+
+        // setter functions
+        dispatch,
+        setSelectedContainer,
       }}
     >
       {children}

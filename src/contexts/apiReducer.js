@@ -5,6 +5,11 @@ const apiReducer = (state, action) => {
         ...state,
         containerOptions: [...action.payload],
       };
+    case "SET_SELECTED_CONTAINER":
+      return {
+        ...state,
+        selectedContainer: action.payload,
+      };
     case "REFRESH":
       return {
         ...state,
