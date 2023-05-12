@@ -1,3 +1,4 @@
+import React, { useContext, useEffect } from "react";
 import {
   Box,
   Button,
@@ -14,7 +15,9 @@ import {
 
   // MuiChat,
 } from "./chat-controller.ts";
-import React from "react";
+import { ApiContext } from "../../contexts/ApiContext.js";
+
+import { askQuestion, getContainerNames } from "../../contexts/apiActions.js";
 
 import { MuiChat } from "./mui/MuiChat.tsx";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
@@ -28,6 +31,13 @@ const muiTheme = createTheme({
 });
 
 export default function ChatBox(): React.ReactElement {
+  const { loading, dispatch } = useContext(ApiContext) as any;
+  console.log("loading", loading);
+
+  useEffect(() => {
+    dispatch({ type: "SET_LOADING" });
+  }, []);
+
   const [chatCtl] = React.useState(
     new ChatController({
       showDateTime: true,
@@ -77,9 +87,29 @@ async function echo(chatCtl: ChatController): Promise<void> {
     type: "text",
     placeholder: "Please enter something",
   });
+
+  // handle api response test
+  // const getContainersRes = await getContainerNames();
+  // console.log("getContainersRes", getContainersRes);
+  // return;
+
+  const question = {
+    question: text.value,
+    bundle: "APU/APU SN P-2273",
+  };
+
+  const test_question = await askQuestion(question);
+
+  console.log("test_question", test_question);
+
+  const answer =
+    test_question.data && test_question.data.answer
+      ? test_question.data.answer
+      : "Sorry, there was an error. Please try again.";
+
   await chatCtl.addMessage({
     type: "text",
-    content: `You have entered:\n${text.value}`,
+    content: `${answer}`,
     self: false,
     avatar: <SmartToyIcon />,
   });

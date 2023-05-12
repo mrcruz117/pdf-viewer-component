@@ -2,6 +2,7 @@
   "name": "pdf-viewer",
   "version": "0.1.0",
   "private": true,
+  "proxy": "https://technicalrecordsapi.aersale.com/",
   "dependencies": {
     "@azure/storage-blob": "^12.14.0",
     "@emotion/react": "^11.10.8",
