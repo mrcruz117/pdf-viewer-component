@@ -10,6 +10,11 @@ const apiReducer = (state, action) => {
         ...state,
         selectedContainer: action.payload,
       };
+    case "SET_CURRENT_PAGE":
+      return {
+        ...state,
+        currentPage: action.payload,
+      };
     case "REFRESH":
       return {
         ...state,

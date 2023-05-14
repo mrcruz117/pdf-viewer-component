@@ -20,6 +20,8 @@ export const ApiProvider = ({ children }) => {
     selectedContainer: "",
     // setSelectedContainer: () => {},
 
+    currentPage: "Ingest Pdf",
+
     loading: false,
   };
 
@@ -31,6 +33,12 @@ export const ApiProvider = ({ children }) => {
     dispatch({
       type: "SET_SELECTED_CONTAINER",
       payload: container,
+    });
+  };
+  const setCurrentPage = (page) => {
+    dispatch({
+      type: "SET_CURRENT_PAGE",
+      payload: page,
     });
   };
 
@@ -64,6 +72,7 @@ export const ApiProvider = ({ children }) => {
         // setter functions
         dispatch,
         setSelectedContainer,
+        setCurrentPage,
       }}
     >
       {children}

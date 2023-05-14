@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+
 // Import the main component
 
 // import { uploadFileToBlobStorage } from "./functions/uploadBlob";
 import PdfIngest from "./components/pdfIngest/PdfIngest";
 import ChatBox from "./components/chat/ChatBox.tsx";
-import { ApiProvider } from "./contexts/ApiContext";
+import { ApiContext, ApiProvider } from "./contexts/ApiContext";
+import NavBar from "./components/NavBar.jsx";
 
 export const App = () => {
+  const { loading, dispatch, currentPage } = useContext(ApiContext);
+
   return (
-    <ApiProvider>
-      <PdfIngest />
-      <ChatBox />
-    </ApiProvider>
+    <>
+      <NavBar />
+      {currentPage === "Ingest Pdf" && <PdfIngest />}
+      {currentPage === "Chat" && <ChatBox />}
+    </>
   );
 };
 
