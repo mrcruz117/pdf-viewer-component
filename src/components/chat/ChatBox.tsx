@@ -66,30 +66,6 @@ export default function ChatBox(): React.ReactElement {
     <ThemeProvider theme={muiTheme}>
       <CssBaseline />
       <Box sx={{ height: "500px" }}>
-        {containerOptions.length > 0 && (
-          <TextField
-            sx={{ minWidth: 120 }}
-            // disabled={ingestionQueue.length > 0}
-            InputLabelProps={{ shrink: true }}
-            // autowidth={true}
-            size={"small"}
-            select
-            value={selectedContainer}
-            label="Saved Documents"
-            onChange={handleSelect}
-            // helperText="Please select your currency"
-            variant="outlined"
-          >
-            <MenuItem value={""}>Select</MenuItem>
-            {containerOptions.map((option: any, idx) => {
-              return (
-                <MenuItem key={`${option}_${idx}`} value={option}>
-                  {option}
-                </MenuItem>
-              );
-            })}
-          </TextField>
-        )}
         <Card
           sx={{
             display: "flex",
@@ -104,6 +80,30 @@ export default function ChatBox(): React.ReactElement {
             boxShadow: 5,
           }}
         >
+          {containerOptions.length > 0 && (
+            <TextField
+              sx={{ minWidth: 120, margin: 1 }}
+              // disabled={ingestionQueue.length > 0}
+              InputLabelProps={{ shrink: true }}
+              // autowidth={true}
+              size={"small"}
+              select
+              value={selectedContainer}
+              label="Saved Documents"
+              onChange={handleSelect}
+              // helperText="Please select your currency"
+              variant="outlined"
+            >
+              <MenuItem value={""}>Select</MenuItem>
+              {containerOptions.map((option: any, idx) => {
+                return (
+                  <MenuItem key={`${option}_${idx}`} value={option}>
+                    {option}
+                  </MenuItem>
+                );
+              })}
+            </TextField>
+          )}
           <Box sx={{ flex: "1 1 0%", height: "500px" }}>
             <MuiChat chatController={chatCtl} />
           </Box>
