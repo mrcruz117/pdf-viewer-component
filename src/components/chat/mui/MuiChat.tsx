@@ -40,7 +40,6 @@ export function MuiChat({
     chatCtl.addOnMessagesChanged(handleMassagesChanged);
     chatCtl.addOnActionChanged(handleActionChanged);
   }, [chatCtl, scroll]);
-  
 
   type CustomComponentType = React.FC<{
     chatController: ChatController;

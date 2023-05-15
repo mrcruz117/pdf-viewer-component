@@ -65,7 +65,7 @@ export default function ChatBox(): React.ReactElement {
   return (
     <ThemeProvider theme={muiTheme}>
       <CssBaseline />
-      <Box sx={{ height: "500px" }}>
+      <Box sx={{ height: "700px" }}>
         <Card
           sx={{
             display: "flex",
@@ -104,7 +104,7 @@ export default function ChatBox(): React.ReactElement {
               })}
             </TextField>
           )}
-          <Box sx={{ flex: "1 1 0%", height: "500px" }}>
+          <Box sx={{ flex: "1 1 0%", height: "600px" }}>
             <MuiChat chatController={chatCtl} />
           </Box>
         </Card>
