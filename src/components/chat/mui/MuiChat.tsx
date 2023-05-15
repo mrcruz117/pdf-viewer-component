@@ -1,6 +1,6 @@
 import { Box, Divider } from "@mui/material";
 import dayjs from "dayjs";
-import React from "react";
+import React, { useEffect } from "react";
 
 import { ChatController } from "../chat-controller";
 import {
@@ -25,10 +25,17 @@ export function MuiChat({
   const scroll = React.useCallback((): void => {
     if (msgRef.current) {
       msgRef.current.scrollTop = msgRef.current.scrollHeight;
+
       // msgRef.current.scrollIntoView(true);
+      msgRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [msgRef]);
+  useEffect(() => {
+    console.log("called", messages);
+    scroll();
+  }, [messages]);
   React.useEffect(() => {
+    // console.log("msgRef.current", msgRef.current);
     function handleMassagesChanged(): void {
       setMessages([...chatCtl.getMessages()]);
       scroll();
@@ -83,14 +90,13 @@ export function MuiChat({
         sx={{
           flex: "1 1 0%",
           overflowY: "auto",
-          WebkitOverflowScrolling: "touch",
+          // WebkitOverflowScrolling: "touch",
           display: "flex",
           flexDirection: "column",
           "& > *": {
             maxWidth: "100%",
           },
         }}
-        ref={msgRef}
       >
         {messages.map((msg): React.ReactElement => {
           let showDate = false;
@@ -132,6 +138,9 @@ export function MuiChat({
             />
           );
         })}
+        <br />
+
+        <div ref={msgRef} />
       </Box>
       <Divider />
       <Box
@@ -149,13 +158,6 @@ export function MuiChat({
           <MuiTextInput
             chatController={chatCtl}
             actionRequest={actReq as TextActionRequest}
-          />
-        )}
-
-        {actReq && actReq.type === "custom" && (
-          <CustomComponent
-            chatController={chatCtl}
-            actionRequest={actReq as CustomActionRequest}
           />
         )}
       </Box>

@@ -95,13 +95,19 @@ export default function ChatBox(): React.ReactElement {
               variant="outlined"
             >
               <MenuItem value={""}>Select</MenuItem>
+
+              {/* 
+              commented out for testing
               {containerOptions.map((option: any, idx) => {
                 return (
                   <MenuItem key={`${option}_${idx}`} value={option}>
                     {option}
                   </MenuItem>
-                );
-              })}
+                  );
+                })} */}
+              <MenuItem key={`APU/APU SN P-2273`} value={"APU/APU SN P-2273"}>
+                APU/APU SN P-2273
+              </MenuItem>
             </TextField>
           )}
           <Box sx={{ flex: "1 1 0%", height: "600px" }}>
@@ -123,6 +129,10 @@ async function echo(
   //   avatar: <SmartToyIcon />,
   // });
 
+  chatCtl.setMessages(
+    chatCtl.getMessages().filter((msg) => msg.content !== "Loading...")
+  );
+
   const text = await chatCtl.setActionRequest({
     type: "text",
     placeholder: "Ask a question",
@@ -142,6 +152,14 @@ async function echo(
 
   console.log("selectedContainer", selectedContainer);
   if (selectedContainer) {
+    // set question loading
+    await chatCtl.addMessage({
+      type: "text",
+      content: `Loading...`,
+      self: false,
+      avatar: <SmartToyIcon />,
+    });
+
     console.log("question", question);
     const test_question = await askQuestion(question);
 
@@ -154,6 +172,13 @@ async function echo(
   } else {
     answer = "Please select a saved document.";
   }
+
+  // update previous chat with answer
+  console.log("messages", chatCtl.getMessages());
+  //filter out loading messages
+  chatCtl.setMessages(
+    chatCtl.getMessages().filter((msg) => msg.content !== "Loading...")
+  );
 
   await chatCtl.addMessage({
     type: "text",
